@@ -14,6 +14,7 @@ exports[`WeekPicker should support dateRender 1`] = `
       >
         <div
           class="ant-calendar-date-panel"
+          tabindex="0"
         >
           <div
             class="ant-calendar-header"
@@ -800,6 +801,7 @@ exports[`WeekPicker should support style prop 1`] = `
       value=""
     />
     <i
+      aria-label="icon: calendar"
       class="anticon anticon-calendar ant-calendar-picker-icon"
     >
       <svg

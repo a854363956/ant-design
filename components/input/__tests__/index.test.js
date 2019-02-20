@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { mount } from 'enzyme';
-import Input from '..';
+
 import Form from '../../form';
+import Input from '..';
 import focusTest from '../../../tests/shared/focusTest';
 
 const { TextArea } = Input;
@@ -92,5 +94,109 @@ describe('Input.Search', () => {
   it('should support suffix', () => {
     const wrapper = mount(<Input.Search suffix="suffix" />);
     expect(wrapper).toMatchSnapshot();
+  });
+});
+
+describe('Input.Password', () => {
+  it('should change type when click', () => {
+    const wrapper = mount(<Input.Password />);
+    wrapper.find('input').simulate('change', { target: { value: '111' } });
+    expect(wrapper).toMatchSnapshot();
+    wrapper
+      .find('.ant-input-password-icon')
+      .at(0)
+      .simulate('click');
+    expect(wrapper).toMatchSnapshot();
+    wrapper
+      .find('.ant-input-password-icon')
+      .at(0)
+      .simulate('click');
+    expect(wrapper).toMatchSnapshot();
+  });
+
+  it('visibilityToggle should work', () => {
+    const wrapper = mount(<Input.Password visibilityToggle={false} />);
+    expect(wrapper.find('.anticon-eye').length).toBe(0);
+    wrapper.setProps({ visibilityToggle: true });
+    expect(wrapper.find('.anticon-eye').length).toBe(1);
+  });
+});
+
+describe('Input allowClear', () => {
+  it('should change type when click', () => {
+    const wrapper = mount(<Input allowClear />);
+    wrapper.find('input').simulate('change', { target: { value: '111' } });
+    expect(wrapper.find('input').getDOMNode().value).toEqual('111');
+    expect(wrapper).toMatchSnapshot();
+    wrapper
+      .find('.ant-input-clear-icon')
+      .at(0)
+      .simulate('click');
+    expect(wrapper).toMatchSnapshot();
+    expect(wrapper.find('input').getDOMNode().value).toEqual('');
+  });
+
+  it('should not show icon if value is undefined, null or empty string', () => {
+    const wrappers = [null, undefined, ''].map(val => mount(<Input allowClear value={val} />));
+    wrappers.forEach(wrapper => {
+      expect(wrapper.find('input').getDOMNode().value).toEqual('');
+      expect(wrapper.find('.ant-input-clear-icon').exists()).toEqual(false);
+      expect(wrapper).toMatchSnapshot();
+    });
+  });
+
+  it('should not show icon if defaultValue is undefined, null or empty string', () => {
+    const wrappers = [null, undefined, ''].map(val =>
+      mount(<Input allowClear defaultValue={val} />),
+    );
+    wrappers.forEach(wrapper => {
+      expect(wrapper.find('input').getDOMNode().value).toEqual('');
+      expect(wrapper.find('.ant-input-clear-icon').exists()).toEqual(false);
+      expect(wrapper).toMatchSnapshot();
+    });
+  });
+
+  it('should trigger event correctly', () => {
+    let argumentEventObject;
+    let argumentEventObjectValue;
+    const onChange = e => {
+      argumentEventObject = e;
+      argumentEventObjectValue = e.target.value;
+    };
+    const wrapper = mount(<Input allowClear defaultValue="111" onChange={onChange} />);
+    wrapper
+      .find('.ant-input-clear-icon')
+      .at(0)
+      .simulate('click');
+    expect(argumentEventObject.type).toBe('click');
+    expect(argumentEventObjectValue).toBe('');
+    expect(
+      wrapper
+        .find('input')
+        .at(0)
+        .getDOMNode().value,
+    ).toBe('');
+  });
+
+  it('should trigger event correctly on controlled mode', () => {
+    let argumentEventObject;
+    let argumentEventObjectValue;
+    const onChange = e => {
+      argumentEventObject = e;
+      argumentEventObjectValue = e.target.value;
+    };
+    const wrapper = mount(<Input allowClear value="111" onChange={onChange} />);
+    wrapper
+      .find('.ant-input-clear-icon')
+      .at(0)
+      .simulate('click');
+    expect(argumentEventObject.type).toBe('click');
+    expect(argumentEventObjectValue).toBe('');
+    expect(
+      wrapper
+        .find('input')
+        .at(0)
+        .getDOMNode().value,
+    ).toBe('111');
   });
 });

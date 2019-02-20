@@ -3,13 +3,9 @@ order: 9
 title: FAQ
 ---
 
-Here are the frequently asked questions about Ant Design and antd that you should look up before you ask in community or create new issue. We also maintain a [FAQ issues label](https://github.com/ant-design/ant-design/issues?q=label%3AFAQ+is%3Aclosed) for common github issues.
+Here are the frequently asked questions about Ant Design and antd that you should look up before you ask in community or create new issue. We also maintain a [FAQ issues label](http://u.ant.design/faq) for common github issues.
 
 ---
-
-### Are you going to provide Vue(etc...) edition?
-
-No, but [the LICENSE of ant-design](https://github.com/ant-design/ant-design/blob/master/LICENSE) is MIT. So, you can try to implement it with ant-design's [style](https://github.com/ant-design/ant-design/tree/master/style), like: [ant-design-vue](https://github.com/vueComponent/ant-design-vue) [vue-beauty](https://github.com/FE-Driver/vue-beauty) or [antue](https://github.com/zzuu666/antue).
 
 ### Are you going to provide Sass/Stylus(etc...) style file?
 
@@ -105,6 +101,10 @@ After 3.9.x [we are using svg icon](/components/icon#svg-icons), so you don't ne
 ### How to extend antd's components?
 
 If you need some features which should not be included in antd, try to extend antd's component with [HOC](https://gist.github.com/sebmarkbage/ef0bf1f338a7182b6775). [more](https://medium.com/@dan_abramov/mixins-are-dead-long-live-higher-order-components-94a0d2f9e750#.eeu8q01s1)
+
+### How to fix dynamic style when open Content Security Policy (CSP)?
+
+You can config `nonce` by [ConfigProvider](/components/config-provider/#Content-Security-Policy).
 
 ### How to spell Ant Design correctly?
 

@@ -2,9 +2,11 @@ import * as React from 'react';
 import * as PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { polyfill } from 'react-lifecycles-compat';
-import Wave from '../_util/wave';
-import Icon from '../icon';
 import Group from './button-group';
+import omit from 'omit.js';
+import Icon from '../icon';
+import { ConfigConsumer, ConfigConsumerProps } from '../config-provider';
+import Wave from '../_util/wave';
 import { tuple } from '../_util/type';
 
 const rxTwoCNChar = /^[\u4e00-\u9fa5]{2}$/;
@@ -40,7 +42,7 @@ function insertSpace(child: React.ReactChild, needInserted: boolean) {
 
 const ButtonTypes = tuple('default', 'primary', 'ghost', 'dashed', 'danger');
 export type ButtonType = (typeof ButtonTypes)[number];
-const ButtonShapes = tuple('circle', 'circle-outline');
+const ButtonShapes = tuple('circle', 'circle-outline', 'round');
 export type ButtonShape = (typeof ButtonShapes)[number];
 const ButtonSizes = tuple('large', 'default', 'small');
 export type ButtonSize = (typeof ButtonSizes)[number];
@@ -85,7 +87,6 @@ class Button extends React.Component<ButtonProps, ButtonState> {
   static __ANT_BUTTON = true;
 
   static defaultProps = {
-    prefixCls: 'ant-btn',
     loading: false,
     ghost: false,
     block: false,
@@ -190,22 +191,24 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     return React.Children.count(children) === 1 && !icon;
   }
 
-  render() {
+  renderButton = ({ getPrefixCls, autoInsertSpaceInButton }: ConfigConsumerProps) => {
     const {
+      prefixCls: customizePrefixCls,
       type,
       shape,
       size,
       className,
       children,
       icon,
-      prefixCls,
       ghost,
       loading: _loadingProp,
       block,
       ...rest
     } = this.props;
-
     const { loading, hasTwoCNChar } = this.state;
+
+    const prefixCls = getPrefixCls('btn', customizePrefixCls);
+    const autoInsertSpace = autoInsertSpaceInButton !== false;
 
     // large => lg
     // small => sm
@@ -227,7 +230,7 @@ class Button extends React.Component<ButtonProps, ButtonState> {
       [`${prefixCls}-icon-only`]: !children && children !== 0 && icon,
       [`${prefixCls}-loading`]: loading,
       [`${prefixCls}-background-ghost`]: ghost,
-      [`${prefixCls}-two-chinese-chars`]: hasTwoCNChar,
+      [`${prefixCls}-two-chinese-chars`]: hasTwoCNChar && autoInsertSpace,
       [`${prefixCls}-block`]: block,
     });
 
@@ -235,9 +238,12 @@ class Button extends React.Component<ButtonProps, ButtonState> {
     const iconNode = iconType ? <Icon type={iconType} /> : null;
     const kids =
       children || children === 0
-        ? React.Children.map(children, child => insertSpace(child, this.isNeedInserted()))
+        ? React.Children.map(children, child =>
+            insertSpace(child as React.ReactChild, this.isNeedInserted() && autoInsertSpace),
+          )
         : null;
-    const linkButtonRestProps = rest as AnchorButtonProps;
+
+    const linkButtonRestProps = omit(rest as AnchorButtonProps, ['htmlType']);
     if (linkButtonRestProps.href !== undefined) {
       return (
         <a
@@ -269,6 +275,10 @@ class Button extends React.Component<ButtonProps, ButtonState> {
         </button>
       </Wave>
     );
+  };
+
+  render() {
+    return <ConfigConsumer>{this.renderButton}</ConfigConsumer>;
   }
 }
 

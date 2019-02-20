@@ -5,6 +5,7 @@ import addEventListener from 'rc-util/lib/Dom/addEventListener';
 import classNames from 'classnames';
 import shallowequal from 'shallowequal';
 import omit from 'omit.js';
+import { ConfigConsumer, ConfigConsumerProps } from '../config-provider';
 import getScroll from '../_util/getScroll';
 import { throttleByAnimationFrameDecorator } from '../_util/throttleByAnimationFrame';
 
@@ -54,6 +55,7 @@ export interface AffixProps {
   /** 设置 Affix 需要监听其滚动事件的元素，值为一个返回对应 DOM 元素的函数 */
   target?: () => Window | HTMLElement | null;
   prefixCls?: string;
+  className?: string;
 }
 
 export interface AffixState {
@@ -97,6 +99,7 @@ export default class Affix extends React.Component<AffixProps, AffixState> {
     if (shallowequal(affixStyle, originalAffixStyle)) {
       return;
     }
+
     this.setState({ affixStyle: affixStyle as React.CSSProperties }, () => {
       const affixed = !!this.state.affixStyle;
       if ((affixStyle && !originalAffixStyle) || (!affixStyle && originalAffixStyle)) {
@@ -162,7 +165,8 @@ export default class Affix extends React.Component<AffixProps, AffixState> {
     const targetRect = getTargetRect(targetNode);
     const targetInnerHeight =
       (targetNode as Window).innerHeight || (targetNode as HTMLElement).clientHeight;
-    if (scrollTop > elemOffset.top - (offsetTop as number) && offsetMode.top) {
+    // ref: https://github.com/ant-design/ant-design/issues/13662
+    if (scrollTop >= elemOffset.top - (offsetTop as number) && offsetMode.top) {
       // Fixed Top
       const width = elemOffset.width;
       const top = targetRect.top + (offsetTop as number);
@@ -177,7 +181,8 @@ export default class Affix extends React.Component<AffixProps, AffixState> {
         height: elemSize.height,
       });
     } else if (
-      scrollTop < elemOffset.top + elemSize.height + (offsetBottom as number) - targetInnerHeight &&
+      scrollTop <=
+        elemOffset.top + elemSize.height + (offsetBottom as number) - targetInnerHeight &&
       offsetMode.bottom
     ) {
       // Fixed Bottom
@@ -274,9 +279,10 @@ export default class Affix extends React.Component<AffixProps, AffixState> {
     this.placeholderNode = node;
   };
 
-  render() {
+  renderAffix = ({ getPrefixCls }: ConfigConsumerProps) => {
+    const { prefixCls } = this.props;
     const className = classNames({
-      [this.props.prefixCls || 'ant-affix']: this.state.affixStyle,
+      [getPrefixCls('affix', prefixCls)]: this.state.affixStyle,
     });
 
     const props = omit(this.props, [
@@ -294,5 +300,9 @@ export default class Affix extends React.Component<AffixProps, AffixState> {
         </div>
       </div>
     );
+  };
+
+  render() {
+    return <ConfigConsumer>{this.renderAffix}</ConfigConsumer>;
   }
 }

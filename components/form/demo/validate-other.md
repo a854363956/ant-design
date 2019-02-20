@@ -11,7 +11,7 @@ title:
 
 ## en-US
 
-Demostration for validataion configuration for form controls which are not show in the above demos.
+Demonstration of validation configuration for form controls which are not shown in the demos above.
 
 ````jsx
 import {
@@ -222,7 +222,7 @@ class Demo extends React.Component {
   }
 }
 
-const WrappedDemo = Form.create()(Demo);
+const WrappedDemo = Form.create({ name: 'validate_other' })(Demo);
 
 ReactDOM.render(<WrappedDemo />, mountNode);
 ````
